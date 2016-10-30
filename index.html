@@ -1,85 +1,120 @@
-<!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on https://github.com/jonrohan -->
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>完美拖拽</title>
+<style type="text/css">
+html,body{overflow:hidden;}
+body,div,h2,p{margin:0;padding:0;}
+body{color:#fff;background:#000;font:12px/2 Arial;}
+p{padding:0 10px;margin-top:10px;}
+span{color:#ff0;padding-left:5px;}
+#box{position:absolute;width:300px;height:150px;background:#333;border:2px solid #ccc;top:50%;left:50%;margin:-75px 0 0 -150px;}
+#box h2{height:25px;cursor:move;background:#222;border-bottom:2px solid #ccc;text-align:right;padding:0 10px;}
+#box h2 a{color:#fff;font:12px/25px Arial;text-decoration:none;outline:none;}
+</style>
+<script type="text/javascript">
+window.onload=function ()
+{
+	var oBox=document.getElementById("box");
+	var oH2 = oBox.getElementsByTagName("h2")[0];
+	var oA = oBox.getElementsByTagName("a")[0];
+	var aSpan = oBox.getElementsByTagName("span");	
+	var disX = disY = 0;
+	var bDrag = false;
+	var aPos = [{x:oBox.offsetLeft, y:oBox.offsetTop}]
+	
+	//鼠标按下, 激活拖拽
+	oH2.onmousedown = function (event)
+	{		
+		var event = event || window.event;
+		bDrag = true;
+		disX = event.clientX - oBox.offsetLeft;
+		disY = event.clientY - oBox.offsetTop;
+		
+		aPos.push({x:oBox.offsetLeft, y:oBox.offsetTop})
+		
+		this.setCapture && this.setCapture();
+		
+		return false
+	};
+	
+	//拖拽开始
+	document.onmousemove = function (event)
+	{
+		if (!bDrag) return;
+		var event = event || window.event;
+		var iL = event.clientX - disX;
+		var iT = event.clientY - disY;
+		var maxL = document.documentElement.clientWidth - oBox.offsetWidth;
+		var maxT = document.documentElement.clientHeight - oBox.offsetHeight;
+		
+		iL = iL < 0 ? 0 : iL;
+		iL = iL > maxL ? maxL : iL; 
+		
+		iT = iT < 0 ? 0 : iT;
+		iT = iT > maxT ? maxT : iT;
+		
+		oBox.style.marginTop = oBox.style.marginLeft = 0;
+		oBox.style.left = iL + "px";
+		oBox.style.top = iT + "px";		
 
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen">
-  <link rel="stylesheet" href="stylesheets/github-dark.css">
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script type="text/javascript" src="javascripts/script.js"></script>
+		aPos.push({x:iL, y:iT})
+		
+		status();
+		
+		return false
+	};
 
-  <title>Hh</title>
-  <meta name="description" content="jj">
-
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-
+	//鼠标释放, 结束拖拽
+	document.onmouseup = window.onblur = oH2.onlosecapture = function ()
+	{
+		bDrag = false;				
+		oH2.releaseCapture && oH2.releaseCapture();
+		status()
+	};
+	
+	//回放拖动轨迹
+	oA.onclick = function ()
+	{
+		if (aPos.length == 1) return;
+		var timer = setInterval(function ()
+		{
+			var oPos = aPos.pop();
+			oPos ? (oBox.style.left = oPos.x + "px", oBox.style.top = oPos.y + "px", status()) : clearInterval(timer)
+		}, 30);
+		
+		this.focus = false;//去除链接虚线
+		
+		return false
+	};
+	
+	//阻止冒泡
+	oA.onmousedown = function (event)
+	{
+		(event || window.event).cancelBubble = true
+	};
+	
+	//监听状态函数
+	function status ()
+	{
+		aSpan[0].innerHTML = bDrag;
+		aSpan[1].innerHTML = oBox.offsetTop;
+		aSpan[2].innerHTML = oBox.offsetLeft
+	}
+	
+	//初始调用
+	status()
+};
+</script>
 </head>
-
 <body>
-
-  <div class="wrapper">
-    <header>
-      <h1 class="title">Hh</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">jj</p>
-      <div id="main" role="main">
-        <div class="download-bar">
-        <div class="inner">
-          <a href="https://github.com/wangguoqing123/hh/tarball/master" class="download-button tar"><span>Download</span></a>
-          <a href="https://github.com/wangguoqing123/hh/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/wangguoqing123/hh" class="code">View Hh on GitHub</a>
-        </div>
-        <span class="blc"></span><span class="trc"></span>
-        </div>
-        <article class="markdown-body">
-          <h3>
-<a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here <a href="https://guides.github.com/features/mastering-markdown/">using GitHub Flavored Markdown</a>, select a template crafted by a designer, and publish. After your page is generated, you can check out the new <code>gh-pages</code> branch locally. If you’re using GitHub Desktop, simply sync your repository and you’ll see the new branch.</p>
-
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We’ve crafted some handsome templates for you to use. Go ahead and click 'Continue to layouts' to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved.</p>
-
-<h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating pages manually</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can @mention a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor’s GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out our <a href="https://help.github.com/pages">documentation</a> or <a href="https://github.com/contact">contact support</a> and we’ll help you sort it out.</p>
-        </article>
-      </div>
-    </div>
-    <footer>
-      <div class="owner">
-      <p><a href="https://github.com/wangguoqing123" class="avatar"><img src="https://avatars3.githubusercontent.com/u/20849421?v=3&amp;s=60" width="48" height="48"></a> <a href="https://github.com/wangguoqing123">wangguoqing123</a> maintains <a href="https://github.com/wangguoqing123/hh">Hh</a></p>
-
-
-      </div>
-      <div class="creds">
-        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
-      </div>
-    </footer>
-  </div>
-  <div class="current-section">
-    <a href="#top">Scroll to top</a>
-    <a href="https://github.com/wangguoqing123/hh/tarball/master" class="tar">tar</a><a href="https://github.com/wangguoqing123/hh/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
-    <p class="name"></p>
-  </div>
-
-  
+<div id="box">
+    <h2><a href="javascript:;">点击回放拖动轨迹</a></h2>
+    <p><strong>Drag:</strong><span></span></p>
+    <p><strong>offsetTop:</strong><span></span></p>
+    <p><strong>offsetLeft:</strong><span></span></p>
+</div>
 </body>
 </html>
+
